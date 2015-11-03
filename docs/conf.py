@@ -110,6 +110,8 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
+# Combine class pydoc with __init__ pydoc
+autoclass_content = 'both'
 
 # -- Options for HTML output ----------------------------------------------
 
