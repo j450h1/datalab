@@ -43,6 +43,7 @@ class Query(object):
 
   def __init__(self, sql, scripts=None, context=None, values=None, **kwargs):
     """Initializes an instance of a Query object.
+       Note that either values or kwargs may be used, but not both.
 
     Args:
       sql: the BigQuery SQL query string to execute, or a SqlStatement object. The latter will
@@ -60,8 +61,6 @@ class Query(object):
           variable references.
       kwargs: arguments to use when expanding the variables if passed a SqlStatement
           or a string with variable references.
-
-      Note that either values or kwargs may be used, but not both.
 
     Raises:
       Exception if expansion of any variables failed.
