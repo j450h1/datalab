@@ -251,7 +251,8 @@ class DataSets(object):
                              info['datasetReference']['datasetId']), self._context)
                     for info in datasets]
       except KeyError:
-        raise Exception('Unexpected item list response.')
+        raise Exception('Unexpected item list response (missing datasetReference in %s)' %
+                        str(info))
 
     page_token = list_info.get('nextPageToken', None)
     return datasets, page_token

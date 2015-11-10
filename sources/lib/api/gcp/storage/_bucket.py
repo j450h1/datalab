@@ -253,7 +253,7 @@ class Buckets(object):
       try:
         buckets = [Bucket(info['name'], info, context=self._context) for info in buckets]
       except KeyError:
-        raise Exception('Unexpected item list response.')
+        raise Exception('Unexpected item list response (missing name in %s)' % str(info))
 
     page_token = list_info.get('nextPageToken', None)
     return buckets, page_token
