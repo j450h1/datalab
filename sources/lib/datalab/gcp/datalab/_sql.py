@@ -304,8 +304,7 @@ def _split_cell(cell, module):
       elif last_def >= 0:
 
         # This is not the first query, so gather the previous query text.
-        query = '\n'.join([line for line in lines[last_def:i] if len(line)]) \
-          .strip()
+        query = '\n'.join([line for line in lines[last_def:i] if len(line)]).strip()
         if select_match and name != gcp.data.SqlModule._SQL_MODULE_MAIN and len(query) == 0:
           # Avoid DEFINE query name\nSELECT ... being seen as an empty DEFINE followed by SELECT
           continue
