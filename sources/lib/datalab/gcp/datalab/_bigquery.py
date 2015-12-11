@@ -202,7 +202,7 @@ def _get_query_argument(args, config, env):
     A Query object.
   """
   sql_arg = args['query']
-  item = _get_notebook_item(sql_arg)
+  item = _utils.get_notebook_item(sql_arg)
   if isinstance(item, gcp.bigquery.Query):  # Queries are already expanded.
     return item
 
@@ -224,7 +224,7 @@ def _sample_cell(args, cell_body):
     was specified. None otherwise.
   """
 
-  env = _notebook_environment()
+  env = _utils.notebook_environment()
   query = None
   table = None
   view = None
@@ -235,7 +235,7 @@ def _sample_cell(args, cell_body):
   elif args['table']:
     table = _get_table(args['table'])
   elif args['view']:
-    view = _get_notebook_item(args['view'])
+    view = _utils.get_notebook_item(args['view'])
     if not isinstance(view, gcp.bigquery.View):
       raise Exception('%s is not a view' % args['view'])
   else:
@@ -283,7 +283,7 @@ def _dryrun_cell(args, config):
   Returns:
     The response wrapped in a DryRunStats object
   """
-  env = _notebook_environment()
+  env = _utils.notebook_environment()
   config = _utils.parse_config(config, env)
   query = _get_query_argument(args, config, env)
 
@@ -359,7 +359,7 @@ def _udf_cell(args, js):
 
   # Finally build the UDF object
   udf = gcp.bigquery.UDF(inputs, outputs, variable_name, js, support_code, imports)
-  _notebook_environment()[variable_name] = udf
+  _utils.notebook_environment()[variable_name] = udf
 
 
 def _execute_cell(args, config):
@@ -375,7 +375,7 @@ def _execute_cell(args, config):
   Returns:
     The QueryResultsTable
   """
-  env = _notebook_environment()
+  env = _utils.notebook_environment()
   config = _utils.parse_config(config, env)
   query = _get_query_argument(args, config, env)
   if args['verbose']:
@@ -401,7 +401,7 @@ def _pipeline_cell(args, config):
     raise Exception('Deploying a pipeline is not yet supported')
 
   env = {}
-  for key, value in _notebook_environment().iteritems():
+  for key, value in _utils.notebook_environment().iteritems():
     if isinstance(value, gcp.bigquery._udf.FunctionCall):
       env[key] = value
 
@@ -442,21 +442,11 @@ def _table_line(args):
     raise Exception('%s does not exist' % name)
 
 
-def _notebook_environment():
-  """ Get the IPython user namespace. """
-  ipy = IPython.get_ipython()
-  return ipy.user_ns
-
-
-def _get_notebook_item(name):
-  """ Get an item from the IPython environment. """
-  env = _notebook_environment()
-  return gcp._util.get_item(env, name)
 
 
 def _get_schema(name):
   """ Given a variable or table name, get the Schema if it exists. """
-  item = _get_notebook_item(name)
+  item = _utils.get_notebook_item(name)
   if not item:
     item = _get_table(name)
 
@@ -481,7 +471,7 @@ def _get_table(name):
     The Table, if found.
   """
   # If name is a variable referencing a table, use that.
-  item = _get_notebook_item(name)
+  item = _utils.get_notebook_item(name)
   if isinstance(item, gcp.bigquery.Table):
     return item
   # Else treat this as a BQ table name and return the (cached) table if it exists.
@@ -581,7 +571,7 @@ def _extract_line(args):
     A message about whether the extract succeeded or failed.
   """
   name = args['source']
-  source = _get_notebook_item(name)
+  source = _utils.get_notebook_item(name)
   if not source:
     source = _get_table(name)
 
@@ -728,7 +718,7 @@ def bigquery(line, cell=None):
   namespace = {}
   if line.find('$') >= 0:
     # We likely have variables to expand; get the appropriate context.
-    namespace = _notebook_environment()
+    namespace = _utils.notebook_environment()
 
   return _utils.handle_magic_line(line, cell, _bigquery_parser, namespace=namespace)
 
